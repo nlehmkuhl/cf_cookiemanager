@@ -580,7 +580,7 @@
                                         </div>
                                         <div id="s-bl">
                                             <div id="cf-category-wrapper" class="cf-category-wrapper">
-                               
+
                                             </div>
                                         </div>
                                         <div id="s-bns">
@@ -970,25 +970,9 @@
                         //tr_description.style.display = "none";
                         tr_description.setAttribute("class", "cookie-additional-description");
                         tr_description.setAttribute("aria-hidden", "true");
-                        _addEvent(tr, 'click', function () {
-                            /* Hide all open Descriptions, only once can be opened */
-                            Array.from(all_modals_container.querySelectorAll(".cookie-additional-header"))
-                                .forEach(function(val) {
-                                    val.setAttribute("class", "cookie-item");
-                                });
-                            if (_hasClass(this.nextSibling, "cookie-description-active") === false) {
-                                Array.from(all_modals_container.querySelectorAll(".cookie-additional-description"))
-                                    .forEach(function(val) {
-                                        _removeClass(val, "cookie-description-active");
-                                    });
-                                this.setAttribute("class", "cookie-additional-header cookie-item");
-                                this.nextSibling.setAttribute("aria-hidden", "false");
-                                _addClass(this.nextSibling, "cookie-description-active");
-                            } else {
-                                _removeClass(this.nextSibling, "cookie-description-active");
-                                this.nextSibling.setAttribute("aria-hidden", "true");
-                            }
-                        });
+                        // FIXME use uuid as id?
+                        tr_description.setAttribute("id", Date.now().toString(36) + Math.random().toString(36).substr(2));
+
                         for (var g = 0; g < all_table_headers.length; ++g) {
                             // get custom header content
                             obj = all_table_headers[g];
@@ -1002,6 +986,38 @@
 
 
                                 tr.appendChild(td_tmp);
+                                // hydrate cookie info button
+                                let infoBtn = tr.getElementsByClassName('cookie-info-btn')[0];
+                                if (infoBtn) {
+                                    infoBtn.setAttribute("aria-expanded", "false");
+                                    infoBtn.setAttribute("aria-controls", tr_description.getAttribute("id"));
+                                    _addEvent(infoBtn, 'click', function () {
+                                        /* Hide all open Descriptions, only one can be opened */
+                                        // FIXME this would have to change aria-expanded state of a button, too... (find the element by its aria-controls attribute value)
+                                        //Array.from(all_modals_container.querySelectorAll(".cookie-additional-header"))
+                                        //    .forEach(function(val) {
+                                        //        val.setAttribute("class", "cookie-item");
+                                        //    });
+
+                                        // get table row
+                                        let tr = this.parentNode.parentNode;
+                                        if (_hasClass(tr.nextSibling, "cookie-description-active") === false) {
+                                            // see above, aria-expanded state...
+                                            // Array.from(all_modals_container.querySelectorAll(".cookie-additional-description"))
+                                            //     .forEach(function(val) {
+                                            //         _removeClass(val, "cookie-description-active");
+                                            //     });
+                                            tr.setAttribute("class", "cookie-additional-header cookie-item");
+                                            tr.nextSibling.setAttribute("aria-hidden", "false");
+                                            this.setAttribute("aria-expanded", "true");
+                                            _addClass(tr.nextSibling, "cookie-description-active");
+                                        } else {
+                                            _removeClass(tr.nextSibling, "cookie-description-active");
+                                            tr.nextSibling.setAttribute("aria-hidden", "true");
+                                            this.setAttribute("aria-expanded", "false");
+                                        }
+                                    });
+                                }
                             }
                         }
 
